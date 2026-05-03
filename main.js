@@ -20,10 +20,10 @@ const geometry = new THREE.BufferGeometry();
 //===================
 
 var MAX_PART = 300;
-var PREFFERED_DISTANCE = 10;
+var PREFFERED_DISTANCE = 20;
 var BOID_MAX_VELOCITY = 40;
 var BOID_MIN_VELOCITY = 10;
-var CLOSE_DISTANCE = 30;
+var CLOSE_DISTANCE = 50;
 
 var COHESION_FACTOR = 1;
 var SEPARATION_FACTOR = 1;
@@ -36,8 +36,8 @@ var boids = [];
 //===================
 
 var TARGET_SPEED = 30;
-var TARGET_ATTRACTION = 1.5;
-var TARGET_DETECTION_RANGE = 30;
+var TARGET_ATTRACTION = 1.1;
+var TARGET_DETECTION_RANGE = 50;
 
 var current_target = new THREE.Vector3(0, 0, 0);
 var new_target = new THREE.Vector3(0, 0, 0);
