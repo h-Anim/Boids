@@ -20,10 +20,10 @@ const geometry = new THREE.BufferGeometry();
 //===================
 
 var MAX_PART = 300;
-var PREFFERED_DISTANCE = 5;
-var BOID_MAX_VELOCITY = 20;
-var BOID_MIN_VELOCITY = 5;
-var CLOSE_DISTANCE = 50;
+var PREFFERED_DISTANCE = 10;
+var BOID_MAX_VELOCITY = 40;
+var BOID_MIN_VELOCITY = 10;
+var CLOSE_DISTANCE = 30;
 
 var COHESION_FACTOR = 1;
 var SEPARATION_FACTOR = 1;
@@ -36,7 +36,8 @@ var boids = [];
 //===================
 
 var TARGET_SPEED = 30;
-var TARGET_ATTRACTION = 1;
+var TARGET_ATTRACTION = 1.5;
+var TARGET_DETECTION_RANGE = 30;
 
 var current_target = new THREE.Vector3(0, 0, 0);
 var new_target = new THREE.Vector3(0, 0, 0);
@@ -316,15 +317,18 @@ function rule3(boid)    //Alignment - match velocity with neighbours
 
 function rule4(boid)    //move toward target
 {
+
     var v4 = new THREE.Vector3(0, 0, 0);    
 
-    v4.subVectors(current_target, boid.position);
-    v4.normalize();    
-    v4.multiplyScalar(BOID_MAX_VELOCITY);
-   // v4.sub(boid.velocity);
-    v4.multiplyScalar(timer.getDelta());
-    v4.multiplyScalar(TARGET_ATTRACTION);
-    
+    if (boid.position.distanceTo( current_target ) < TARGET_DETECTION_RANGE)
+    {
+        v4.subVectors(current_target, boid.position);
+        v4.normalize();    
+        v4.multiplyScalar(BOID_MAX_VELOCITY);
+    // v4.sub(boid.velocity);
+        v4.multiplyScalar(timer.getDelta());
+        v4.multiplyScalar(TARGET_ATTRACTION);
+    }
     return v4;
 }
 
@@ -375,7 +379,7 @@ function moveBoids(delta)
         boids[i].acceleration.add(v2);
         boids[i].acceleration.add(v3); 
 
-        if (i % 3 == 0)
+        //if (i % 3 == 0)
         {
             var v4 = rule4(boids[i]);
             boids[i].acceleration.add(v4); 
@@ -466,7 +470,7 @@ function createPanel()
     const folder3 = gui.addFolder( 'Target Settings' );
 
     //================================================================================
-    var boidS = { Comfort_Distance: 5, Detection_Radius: 50 , Max_Velocity: 20}
+    var boidS = { Comfort_Distance: PREFFERED_DISTANCE, Detection_Radius: CLOSE_DISTANCE , Max_Velocity: BOID_MAX_VELOCITY}
 
     folder1.add( boidS, 'Comfort_Distance', 3, 30, 1 ).onChange( value => {
         PREFFERED_DISTANCE = value;
@@ -496,7 +500,7 @@ function createPanel()
     } ); // min, max, step
 
     //================================================================================
-    var targetS = { Target_Speed: 30, Target_Attraction: 1 }
+    var targetS = { Target_Speed: TARGET_SPEED, Target_Attraction: TARGET_ATTRACTION, Target_Detection_Range: TARGET_DETECTION_RANGE }
 
     folder3.add( targetS, 'Target_Speed', 1, 100, 5 ).onChange( value => {
         TARGET_SPEED =  value ;
@@ -505,6 +509,13 @@ function createPanel()
     folder3.add( targetS, 'Target_Attraction', 0, 2 ).onChange( value => {
         TARGET_ATTRACTION = value ;
     } ); // min, max
+
+    folder3.add( targetS, 'Target_Detection_Range', 10, 100, 5 ).onChange( value => {
+        TARGET_DETECTION_RANGE = value ;
+    } ); // min, max
+
+    //TARGET_DETECTION_RANGE
+
 
     const button = {
         Reset: function() { reset() }
